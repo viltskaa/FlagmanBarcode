@@ -1,8 +1,10 @@
 ﻿using BarcodeScannerBusinessLogic.BusinessLogic;
 using BarcodeScannerContracts.BusinessLogicContracts;
+using Newtonsoft.Json;
 using QRCoder;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.IO;
 using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
@@ -114,7 +116,7 @@ namespace BarcodeScanner
 
         private void PrintBarcodeAndQRCode(string barcodeFilename, long gtin, long timestamp)
         {
-            if (string.IsNullOrEmpty(barcodeFilename) || !System.IO.File.Exists(barcodeFilename))
+            if (string.IsNullOrEmpty(barcodeFilename) || !File.Exists(barcodeFilename))
             {
                 MessageBox.Show("Файл изображения штрих-кода не найден.");
                 return;
@@ -130,51 +132,65 @@ namespace BarcodeScanner
             var barcodeImage = System.Drawing.Image.FromFile(barcodeFilename);
             var qrImage = GenerateQrCode(gtin, timestamp);
 
+            LabelConfig config;
+            try
+            {
+                config = LoadConfig("config.json");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки конфигурации: {ex.Message}");
+                return;
+            }
+
             PrintDocument printDocument = new PrintDocument
             {
                 PrinterSettings = new PrinterSettings
                 {
                     PrinterName = selectedPrinter
-                }
+                },
+                DefaultPageSettings = { Margins = new Margins(0, 0, 0, 0) }
             };
 
             int pageNumber = 1;
 
             printDocument.PrintPage += (s, ev) =>
             {
+                const float cmToPixels = 37.8f;
+                float targetWidth = config.LabelWidthCm * cmToPixels;
+                float targetHeight = config.LabelHeightCm * cmToPixels;
+
+                var imageToPrint = pageNumber == 1 ? barcodeImage : qrImage;
+
+                using (Bitmap resizedImage = new Bitmap((int)targetWidth, (int)targetHeight))
+                {
+                    using (Graphics g = Graphics.FromImage(resizedImage))
+                    {
+                        g.Clear(Color.White);
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+                        float scaleX = targetWidth / imageToPrint.Width;
+                        float scaleY = targetHeight / imageToPrint.Height;
+                        float scale = Math.Min(scaleX, scaleY);
+
+                        float scaledWidth = imageToPrint.Width * scale;
+                        float scaledHeight = imageToPrint.Height * scale;
+                        float offsetX = (targetWidth - scaledWidth) / 2;
+                        float offsetY = (targetHeight - scaledHeight) / 2;
+
+                        g.DrawImage(imageToPrint, offsetX, offsetY, scaledWidth, scaledHeight);
+                    }
+
+                    ev.Graphics.DrawImage(resizedImage, ev.MarginBounds.Left, ev.MarginBounds.Top);
+                }
+
                 if (pageNumber == 1)
                 {
-                    float maxWidth = ev.MarginBounds.Width;
-                    float maxHeight = ev.MarginBounds.Height;
-
-                    float imageWidth = maxWidth / 3;
-                    float imageHeight = maxHeight / 6;
-
-                    var scaledImage = new Bitmap(barcodeImage, new System.Drawing.Size((int)imageWidth, (int)imageHeight));
-
-                    float x = (ev.MarginBounds.Width - imageWidth) / 2 + ev.MarginBounds.Left;
-                    float y = (ev.MarginBounds.Height - imageHeight) / 2 + ev.MarginBounds.Top;
-
-                    ev.Graphics.DrawImage(scaledImage, new System.Drawing.RectangleF(x, y, imageWidth, imageHeight));
-
-                    pageNumber++; 
+                    pageNumber++;
                     ev.HasMorePages = true;
                 }
-                else if (pageNumber == 2) 
+                else
                 {
-                    float maxWidth = ev.MarginBounds.Width;
-                    float maxHeight = ev.MarginBounds.Height;
-
-                    float imageWidth = maxWidth / 3;
-                    float imageHeight = maxHeight / 5;
-
-                    var scaledImage = new Bitmap(qrImage, new System.Drawing.Size((int)imageWidth, (int)imageHeight));
-
-                    float x = (ev.MarginBounds.Width - imageWidth) / 2 + ev.MarginBounds.Left;
-                    float y = (ev.MarginBounds.Height - imageHeight) / 2 + ev.MarginBounds.Top;
-
-                    ev.Graphics.DrawImage(scaledImage, new System.Drawing.RectangleF(x, y, imageWidth, imageHeight));
-
                     ev.HasMorePages = false;
                 }
             };
@@ -190,6 +206,22 @@ namespace BarcodeScanner
             }
         }
 
+        public class LabelConfig
+        {
+            public float LabelWidthCm { get; set; }
+            public float LabelHeightCm { get; set; }
+        }
+
+        private LabelConfig LoadConfig(string configFilePath)
+        {
+            if (!File.Exists(configFilePath))
+            {
+                throw new FileNotFoundException("Конфигурационный файл не найден.");
+            }
+
+            string configContent = File.ReadAllText(configFilePath);
+            return JsonConvert.DeserializeObject<LabelConfig>(configContent);
+        }
 
         private void BarcodeList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
