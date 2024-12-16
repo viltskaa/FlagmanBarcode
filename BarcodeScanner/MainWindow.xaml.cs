@@ -1,7 +1,4 @@
-﻿using BarcodeScannerBusinessLogic.BusinessLogic;
-using BarcodeScannerContracts.BusinessLogicContracts;
-using ControlzEx.Standard;
-using MahApps.Metro.Controls.Dialogs;
+﻿using BarcodeScannerContracts.BusinessLogicContracts;
 using Newtonsoft.Json;
 using QRCoder;
 using System.Drawing;
@@ -11,7 +8,6 @@ using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Svg;
 
 namespace BarcodeScanner
 {
@@ -124,21 +120,9 @@ namespace BarcodeScanner
                     });
 
                     var qrImage = GenerateQrCode(barcodeGtin, time);
+                    var barcodeImage = System.Drawing.Image.FromFile(product.Filename);
 
-                    if (product.Filename.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var svgDoc = SvgDocument.Open(product.Filename);
-                        var bitmap = svgDoc.Draw();
-                        barcodeImages.Add(bitmap);
-                    }
-                    else
-                    {
-                        using (var barcodeImage = System.Drawing.Image.FromFile(product.Filename))
-                        {
-                            barcodeImages.Add(barcodeImage.Clone() as System.Drawing.Image);
-                        }
-                    }
-
+                    barcodeImages.Add(barcodeImage);
                     qrImages.Add(qrImage);
                 }
 
@@ -182,40 +166,29 @@ namespace BarcodeScanner
             int currentIndex = 0;
             bool isBarcodePage = true;
 
-            LabelConfig config;
-            try
-            {
-                config = LoadConfig("config.json");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка загрузки конфигурации: {ex.Message}");
-                return;
-            }
-
             printDocument.PrintPage += (s, ev) =>
             {
-                const float cmToPixels = 37.8f;
-                float targetWidth = config.LabelWidthCm * cmToPixels;
-                float targetHeight = config.LabelHeightCm * cmToPixels;
+                Rectangle printArea = ev.MarginBounds;
+                float width = (float)printArea.Width;
+                float height = (float)printArea.Height;
 
-                using (Bitmap resizedImage = new Bitmap((int)targetWidth, (int)targetHeight))
+                var imageToPrint = isBarcodePage ? barcodeImages[currentIndex] : qrImages[currentIndex];
+
+                using (Bitmap resizedImage = new Bitmap((int)width, (int)height))
                 {
                     using (Graphics g = Graphics.FromImage(resizedImage))
                     {
-                        g.Clear(System.Drawing.Color.White);
+                        g.Clear(Color.White);
                         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
-                        var imageToPrint = isBarcodePage ? barcodeImages[currentIndex] : qrImages[currentIndex];
-
-                        float scaleX = targetWidth / imageToPrint.Width;
-                        float scaleY = targetHeight / imageToPrint.Height;
+                        float scaleX = width / imageToPrint.Width;
+                        float scaleY = height / imageToPrint.Height;
                         float scale = Math.Min(scaleX, scaleY);
 
                         float scaledWidth = imageToPrint.Width * scale;
                         float scaledHeight = imageToPrint.Height * scale;
-                        float offsetX = (targetWidth - scaledWidth) / 2;
-                        float offsetY = (targetHeight - scaledHeight) / 2;
+                        float offsetX =(width - scaledWidth) / 2;
+                        float offsetY =(height - scaledHeight) / 2;
 
                         g.DrawImage(imageToPrint, offsetX, offsetY, scaledWidth, scaledHeight);
                     }

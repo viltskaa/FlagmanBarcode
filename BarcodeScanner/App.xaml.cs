@@ -3,15 +3,10 @@ using BarcodeScannerContracts.BusinessLogicContracts;
 using BarcodeScannerContracts.StorageContracts;
 using BarcodeScannerDatabaseImplement.Implements;
 using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 
 namespace BarcodeScanner
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         private static ServiceProvider? _serviceProvider;
