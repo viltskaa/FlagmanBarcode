@@ -46,6 +46,7 @@ namespace BarcodeScanner
             services.AddTransient<IQrStuffLogic, QrStuffLogic>();
 
             services.AddTransient<MainWindow>();
+            services.AddTransient<QuantityInputDialog>();
         }
     }
 

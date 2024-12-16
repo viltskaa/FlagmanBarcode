@@ -3,42 +3,86 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeScanner", "BarcodeScanner\BarcodeScanner.csproj", "{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarcodeScanner", "BarcodeScanner\BarcodeScanner.csproj", "{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeScannerDataModels", "BarcodeScannerDataModels\BarcodeScannerDataModels.csproj", "{204D3621-AEF8-4877-9007-A39C4B6CD74D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarcodeScannerDataModels", "BarcodeScannerDataModels\BarcodeScannerDataModels.csproj", "{204D3621-AEF8-4877-9007-A39C4B6CD74D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeScannerContracts", "BarcodeScannerContracts\BarcodeScannerContracts.csproj", "{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarcodeScannerContracts", "BarcodeScannerContracts\BarcodeScannerContracts.csproj", "{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeScannerDatabaseImplement", "BarcodeScannerDatabaseImplement\BarcodeScannerDatabaseImplement.csproj", "{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarcodeScannerDatabaseImplement", "BarcodeScannerDatabaseImplement\BarcodeScannerDatabaseImplement.csproj", "{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarcodeScannerBusinessLogic", "BarcodeScannerBusinessLogic\BarcodeScannerBusinessLogic.csproj", "{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BarcodeScannerBusinessLogic", "BarcodeScannerBusinessLogic\BarcodeScannerBusinessLogic.csproj", "{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM32 = Debug|ARM32
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|ARM32 = Release|ARM32
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Debug|ARM32.Build.0 = Debug|ARM32
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Debug|x86.ActiveCfg = Debug|x86
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Debug|x86.Build.0 = Debug|x86
 		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Release|ARM32.ActiveCfg = Release|ARM32
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Release|ARM32.Build.0 = Release|ARM32
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Release|x86.ActiveCfg = Release|x86
+		{A12C88D2-239F-42E9-BE73-10B3EEA7FA95}.Release|x86.Build.0 = Release|x86
 		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Debug|ARM32.Build.0 = Debug|ARM32
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Debug|x86.ActiveCfg = Debug|x86
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Debug|x86.Build.0 = Debug|x86
 		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Release|ARM32.ActiveCfg = Release|ARM32
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Release|ARM32.Build.0 = Release|ARM32
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Release|x86.ActiveCfg = Release|x86
+		{204D3621-AEF8-4877-9007-A39C4B6CD74D}.Release|x86.Build.0 = Release|x86
 		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Debug|ARM32.Build.0 = Debug|ARM32
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Debug|x86.ActiveCfg = Debug|x86
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Debug|x86.Build.0 = Debug|x86
 		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Release|ARM32.ActiveCfg = Release|ARM32
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Release|ARM32.Build.0 = Release|ARM32
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Release|x86.ActiveCfg = Release|x86
+		{3BC8DC0E-9DA7-4CA3-8628-B4305123F934}.Release|x86.Build.0 = Release|x86
 		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Debug|ARM32.Build.0 = Debug|ARM32
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Debug|x86.ActiveCfg = Debug|x86
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Debug|x86.Build.0 = Debug|x86
 		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Release|ARM32.ActiveCfg = Release|ARM32
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Release|ARM32.Build.0 = Release|ARM32
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Release|x86.ActiveCfg = Release|x86
+		{BF6CC075-C9A8-4DE8-B293-B1F33F161F4B}.Release|x86.Build.0 = Release|x86
 		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Debug|ARM32.Build.0 = Debug|ARM32
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Debug|x86.ActiveCfg = Debug|x86
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Debug|x86.Build.0 = Debug|x86
 		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Release|ARM32.ActiveCfg = Release|ARM32
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Release|ARM32.Build.0 = Release|ARM32
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Release|x86.ActiveCfg = Release|x86
+		{12C32C01-5F13-4A13-8E4B-2DE0B67F4AD9}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

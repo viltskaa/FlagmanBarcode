@@ -1,5 +1,7 @@
 ﻿using BarcodeScannerBusinessLogic.BusinessLogic;
 using BarcodeScannerContracts.BusinessLogicContracts;
+using ControlzEx.Standard;
+using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
 using QRCoder;
 using System.Drawing;
@@ -9,6 +11,7 @@ using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Svg;
 
 namespace BarcodeScanner
 {
@@ -63,7 +66,6 @@ namespace BarcodeScanner
                 PrinterList.SelectedIndex = 0;
             }
         }
-
         private void BarcodeInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -75,9 +77,17 @@ namespace BarcodeScanner
                     return;
                 }
 
+                if (!long.TryParse(inputBarcode, out long barcodeGtin))
+                {
+                    MessageBox.Show("Неверный формат штрих-кода.");
+                    BarcodeInput.Clear();
+                    SetFocusOnInput();
+                    return;
+                }
+
                 var product = _barcodeProductLogic.ReadElement(new BarcodeScannerContracts.SearchModels.BarcodeProductSearchModel
                 {
-                    Gtin = long.Parse(inputBarcode)
+                    Gtin = barcodeGtin
                 });
 
                 if (product == null)
@@ -88,15 +98,51 @@ namespace BarcodeScanner
                     return;
                 }
 
-                long time = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-                _qrStuffLogic.Create(new BarcodeScannerContracts.BindingModels.QrStuffBindingModel
+                int quantity;
+                var quantityInputDialog = new QuantityInputDialog(1, 100);
+                if (quantityInputDialog.ShowDialog() == true)
                 {
-                    Gtin = long.Parse(inputBarcode),
-                    Timestamp = time
-                });
+                    quantity = quantityInputDialog.Quantity;
+                }
+                else
+                {
+                    SetFocusOnInput();
+                    return;
+                }
 
-                PrintBarcodeAndQRCode(product.Filename, product.Gtin, time);
+                List<System.Drawing.Image> barcodeImages = new List<System.Drawing.Image>();
+                List<System.Drawing.Image> qrImages = new List<System.Drawing.Image>();
+
+                for (int i = 0; i < quantity; i++)
+                {
+                    long time = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                    _qrStuffLogic.Create(new BarcodeScannerContracts.BindingModels.QrStuffBindingModel
+                    {
+                        Gtin = barcodeGtin,
+                        Timestamp = time
+                    });
+
+                    var qrImage = GenerateQrCode(barcodeGtin, time);
+
+                    if (product.Filename.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var svgDoc = SvgDocument.Open(product.Filename);
+                        var bitmap = svgDoc.Draw();
+                        barcodeImages.Add(bitmap);
+                    }
+                    else
+                    {
+                        using (var barcodeImage = System.Drawing.Image.FromFile(product.Filename))
+                        {
+                            barcodeImages.Add(barcodeImage.Clone() as System.Drawing.Image);
+                        }
+                    }
+
+                    qrImages.Add(qrImage);
+                }
+
+                PrintBarcodesAndQRCodes(barcodeImages, qrImages);
 
                 BarcodeInput.Clear();
                 LoadBarcodes();
@@ -114,14 +160,8 @@ namespace BarcodeScanner
             return qrImage;
         }
 
-        private void PrintBarcodeAndQRCode(string barcodeFilename, long gtin, long timestamp)
+        private void PrintBarcodesAndQRCodes(List<System.Drawing.Image> barcodeImages, List<System.Drawing.Image> qrImages)
         {
-            if (string.IsNullOrEmpty(barcodeFilename) || !File.Exists(barcodeFilename))
-            {
-                MessageBox.Show("Файл изображения штрих-кода не найден.");
-                return;
-            }
-
             if (PrinterList.SelectedItem == null)
             {
                 MessageBox.Show("Выберите принтер.");
@@ -129,8 +169,18 @@ namespace BarcodeScanner
             }
 
             string selectedPrinter = PrinterList.SelectedItem.ToString();
-            var barcodeImage = System.Drawing.Image.FromFile(barcodeFilename);
-            var qrImage = GenerateQrCode(gtin, timestamp);
+
+            PrintDocument printDocument = new PrintDocument
+            {
+                PrinterSettings = new PrinterSettings
+                {
+                    PrinterName = selectedPrinter
+                },
+                DefaultPageSettings = { Margins = new Margins(0, 0, 0, 0) }
+            };
+
+            int currentIndex = 0;
+            bool isBarcodePage = true;
 
             LabelConfig config;
             try
@@ -143,31 +193,20 @@ namespace BarcodeScanner
                 return;
             }
 
-            PrintDocument printDocument = new PrintDocument
-            {
-                PrinterSettings = new PrinterSettings
-                {
-                    PrinterName = selectedPrinter
-                },
-                DefaultPageSettings = { Margins = new Margins(0, 0, 0, 0) }
-            };
-
-            int pageNumber = 1;
-
             printDocument.PrintPage += (s, ev) =>
             {
                 const float cmToPixels = 37.8f;
                 float targetWidth = config.LabelWidthCm * cmToPixels;
                 float targetHeight = config.LabelHeightCm * cmToPixels;
 
-                var imageToPrint = pageNumber == 1 ? barcodeImage : qrImage;
-
                 using (Bitmap resizedImage = new Bitmap((int)targetWidth, (int)targetHeight))
                 {
                     using (Graphics g = Graphics.FromImage(resizedImage))
                     {
-                        g.Clear(Color.White);
+                        g.Clear(System.Drawing.Color.White);
                         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+                        var imageToPrint = isBarcodePage ? barcodeImages[currentIndex] : qrImages[currentIndex];
 
                         float scaleX = targetWidth / imageToPrint.Width;
                         float scaleY = targetHeight / imageToPrint.Height;
@@ -184,15 +223,13 @@ namespace BarcodeScanner
                     ev.Graphics.DrawImage(resizedImage, ev.MarginBounds.Left, ev.MarginBounds.Top);
                 }
 
-                if (pageNumber == 1)
+                if (!isBarcodePage)
                 {
-                    pageNumber++;
-                    ev.HasMorePages = true;
+                    currentIndex++;
                 }
-                else
-                {
-                    ev.HasMorePages = false;
-                }
+
+                isBarcodePage = !isBarcodePage;
+                ev.HasMorePages = currentIndex < barcodeImages.Count;
             };
 
             try
