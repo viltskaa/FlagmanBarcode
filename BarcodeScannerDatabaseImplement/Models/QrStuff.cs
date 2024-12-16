@@ -20,7 +20,6 @@ namespace BarcodeScannerDatabaseImplement.Models
         [Required]
         [DataMember]
         public long Gtin { get; set; }
-        public virtual BarcodeProduct BarcodeProduct { get; set; }
         [Required]
         [DataMember]
         public long Timestamp { get; set; }

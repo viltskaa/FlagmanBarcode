@@ -22,8 +22,6 @@ namespace BarcodeScannerDatabaseImplement.Models
         [Required]
         [DataMember]
         public string Filename { get; set; } = string.Empty;
-        [ForeignKey("Gtin")]
-        public virtual List<QrStuff> QrStuffs { get; set; } = new();
 
         public static BarcodeProduct? Create(BarcodeProductBindingModel? model)
         {

@@ -1,4 +1,5 @@
-﻿using BarcodeScannerContracts.BusinessLogicContracts;
+﻿using BarcodeScannerBusinessLogic.BusinessLogic;
+using BarcodeScannerContracts.BusinessLogicContracts;
 using Newtonsoft.Json;
 using QRCoder;
 using System.Drawing;
@@ -24,8 +25,25 @@ namespace BarcodeScanner
             InitializeComponent();
             LoadBarcodes();
             LoadPrinters();
+            SaveProducts();
 
             SetFocusOnInput();
+        }
+
+        private void SaveProducts()
+        {
+            _barcodeProductLogic.DeleteAll();
+            _barcodeProductLogic.SaveFilesFromDirectory("C:/Barcodes");
+            SetFocusOnInput();
+            return;
+        }
+
+        private void LoadBarcodesButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveProducts();
+            MessageBox.Show("Данные успешно загружены.");
+            SetFocusOnInput();
+            return;
         }
 
         private void LoadBarcodes()

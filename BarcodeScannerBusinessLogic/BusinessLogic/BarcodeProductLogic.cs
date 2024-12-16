@@ -45,5 +45,33 @@ namespace BarcodeScannerBusinessLogic.BusinessLogic
             }
             return list;
         }
+
+        public void DeleteAll()
+        {
+            _barcodeProductStorage.DeleteAll();
+        }
+
+        public void SaveFilesFromDirectory(string directoryPath)
+        {
+            if (!Directory.Exists(directoryPath))
+            {
+                throw new DirectoryNotFoundException($"Папка {directoryPath} не найдена.");
+            }
+
+            var files = Directory.GetFiles(directoryPath);
+
+            foreach (var file in files)
+            {
+                string gtin = Path.GetFileNameWithoutExtension(file);
+
+                var barcodeProduct = new BarcodeProductBindingModel
+                {
+                    Gtin = long.TryParse(gtin, out var parsedGtin) ? parsedGtin : 0,
+                    Filename = file
+                };
+
+                Create(barcodeProduct);
+            }
+        }
     }
 }

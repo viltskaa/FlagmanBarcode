@@ -12,7 +12,7 @@ namespace BarcodeScannerDatabaseImplement.Implements
         public List<QrStuffViewModel> GetAll()
         {
             using var context = new BarcodeScannerDatabase();
-            return context.QrStuffs.Include(x => x.BarcodeProduct).Select(x => x.GetViewModel).ToList();
+            return context.QrStuffs.Select(x => x.GetViewModel).ToList();
         }
 
         public QrStuffViewModel? GetElement(QrStuffSearchModel model)
@@ -20,9 +20,9 @@ namespace BarcodeScannerDatabaseImplement.Implements
             using var context = new BarcodeScannerDatabase();
 
             if (model.Id.HasValue)
-                return context.QrStuffs.Include(x => x.BarcodeProduct).FirstOrDefault(x => x.Id == model.Id)?.GetViewModel;
+                return context.QrStuffs.FirstOrDefault(x => x.Id == model.Id)?.GetViewModel;
             else if (model.Gtin.HasValue)
-                return context.QrStuffs.Include(x => x.BarcodeProduct).FirstOrDefault(x => x.Gtin == model.Gtin)?.GetViewModel;
+                return context.QrStuffs.FirstOrDefault(x => x.Gtin == model.Gtin)?.GetViewModel;
 
             return null;
         }
@@ -31,7 +31,7 @@ namespace BarcodeScannerDatabaseImplement.Implements
         {
             using var context = new BarcodeScannerDatabase();
 
-            var query = context.QrStuffs.Include(x => x.BarcodeProduct).AsQueryable();
+            var query = context.QrStuffs.AsQueryable();
 
             if (model.Gtin != null)
             {

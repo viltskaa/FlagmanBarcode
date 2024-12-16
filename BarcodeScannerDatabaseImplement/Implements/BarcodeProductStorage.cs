@@ -51,5 +51,13 @@ namespace BarcodeScannerDatabaseImplement.Implements
             context.SaveChanges();
             return newBarcode.GetViewModel;
         }
+
+        public void DeleteAll()
+        {
+            using var context = new BarcodeScannerDatabase();
+            var allRecords = context.BarcodeProducts.ToList();
+            context.BarcodeProducts.RemoveRange(allRecords);  
+            context.SaveChanges();
+        }
     }
 }

@@ -14,5 +14,7 @@ namespace BarcodeScannerContracts.BusinessLogicContracts
         List<BarcodeProductViewModel>? ReadList(BarcodeProductSearchModel? model);
         BarcodeProductViewModel? ReadElement(BarcodeProductSearchModel model);
         bool Create(BarcodeProductBindingModel model);
+        void SaveFilesFromDirectory(string directory);
+        void DeleteAll();
     }
 }

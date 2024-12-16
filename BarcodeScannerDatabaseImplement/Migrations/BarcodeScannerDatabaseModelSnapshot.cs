@@ -45,25 +45,7 @@ namespace BarcodeScannerDatabaseImplement.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Gtin");
-
                     b.ToTable("QrStuffs");
-                });
-
-            modelBuilder.Entity("BarcodeScannerDatabaseImplement.Models.QrStuff", b =>
-                {
-                    b.HasOne("BarcodeScannerDatabaseImplement.Models.BarcodeProduct", "BarcodeProduct")
-                        .WithMany("QrStuffs")
-                        .HasForeignKey("Gtin")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BarcodeProduct");
-                });
-
-            modelBuilder.Entity("BarcodeScannerDatabaseImplement.Models.BarcodeProduct", b =>
-                {
-                    b.Navigation("QrStuffs");
                 });
 #pragma warning restore 612, 618
         }

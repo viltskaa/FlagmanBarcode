@@ -10,5 +10,6 @@ namespace BarcodeScannerContracts.StorageContracts
         List<BarcodeProductViewModel> GetFilteredAll(BarcodeProductSearchModel model);
         BarcodeProductViewModel? GetElement(BarcodeProductSearchModel model);
         BarcodeProductViewModel? Insert(BarcodeProductBindingModel model);
+        void DeleteAll();
     }
 }

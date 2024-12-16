@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BarcodeScannerDatabaseImplement.Migrations
 {
     [DbContext(typeof(BarcodeScannerDatabase))]
-    [Migration("20241203150409_FixMig")]
-    partial class FixMig
+    [Migration("20241216165131_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,25 +48,7 @@ namespace BarcodeScannerDatabaseImplement.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Gtin");
-
                     b.ToTable("QrStuffs");
-                });
-
-            modelBuilder.Entity("BarcodeScannerDatabaseImplement.Models.QrStuff", b =>
-                {
-                    b.HasOne("BarcodeScannerDatabaseImplement.Models.BarcodeProduct", "BarcodeProduct")
-                        .WithMany("QrStuffs")
-                        .HasForeignKey("Gtin")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BarcodeProduct");
-                });
-
-            modelBuilder.Entity("BarcodeScannerDatabaseImplement.Models.BarcodeProduct", b =>
-                {
-                    b.Navigation("QrStuffs");
                 });
 #pragma warning restore 612, 618
         }
