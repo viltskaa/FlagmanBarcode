@@ -3,6 +3,7 @@ using BarcodeScannerContracts.BusinessLogicContracts;
 using BarcodeScannerContracts.SearchModels;
 using BarcodeScannerContracts.StorageContracts;
 using BarcodeScannerContracts.ViewModels;
+using BarcodeScannerDatabaseImplement.Implements;
 
 namespace BarcodeScannerBusinessLogic.BusinessLogic
 {
@@ -65,6 +66,11 @@ namespace BarcodeScannerBusinessLogic.BusinessLogic
                 return null;
             }
             return list;
+        }
+
+        public void DeleteAll()
+        {
+            _qrStuffStorage.DeleteAll();
         }
     }
 }

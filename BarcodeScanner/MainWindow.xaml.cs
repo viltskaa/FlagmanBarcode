@@ -5,6 +5,7 @@ using QRCoder;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
+using System.Management;
 using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,6 +29,35 @@ namespace BarcodeScanner
             SaveProducts();
 
             SetFocusOnInput();
+
+            this.PreviewKeyDown += OnPreviewKeyDown;
+        }
+
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) &&
+                Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) &&
+                Keyboard.Modifiers.HasFlag(ModifierKeys.Alt) &&
+                e.Key == Key.D)
+            {
+                ConfirmAndDeleteAll();
+            }
+        }
+
+        private void ConfirmAndDeleteAll()
+        {
+            var result = MessageBox.Show(
+                "Вы уверены, что хотите удалить все записи?",
+                "Подтверждение удаления",
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.OK)
+            {
+                _qrStuffLogic.DeleteAll();
+                MessageBox.Show("Все записи успешно удалены.");
+                LoadBarcodes();
+            }
         }
 
         private void SaveProducts()
@@ -70,16 +100,43 @@ namespace BarcodeScanner
 
         private void LoadPrinters()
         {
-            var printServer = new LocalPrintServer();
-            var printers = printServer.GetPrintQueues().Select(pq => pq.Name).ToList();
+            const string preferredModel = "Xprinter XP-370B";
+            string preferredPrinterName = null;
 
-            PrinterList.ItemsSource = printers;
+            var printerNames = new List<string>();
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Printer");
 
-            if (printers.Count > 0)
+            foreach (ManagementObject printer in searcher.Get())
+            {
+                string printerName = printer["Name"]?.ToString();
+                string printerModel = printer["DriverName"]?.ToString(); 
+
+                if (!string.IsNullOrEmpty(printerName))
+                {
+                    printerNames.Add(printerName);
+
+                    if (!string.IsNullOrEmpty(printerModel) &&
+                        printerModel.Equals(preferredModel, StringComparison.OrdinalIgnoreCase))
+                    {
+                        preferredPrinterName = printerName;
+                    }
+                }
+            }
+
+            if (preferredPrinterName != null)
+            {
+                printerNames.Remove(preferredPrinterName);
+                printerNames.Insert(0, preferredPrinterName);
+            }
+
+            PrinterList.ItemsSource = printerNames;
+
+            if (printerNames.Count > 0)
             {
                 PrinterList.SelectedIndex = 0;
             }
         }
+
         private void BarcodeInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -129,7 +186,7 @@ namespace BarcodeScanner
 
                 for (int i = 0; i < quantity; i++)
                 {
-                    long time = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    long time = DateTimeOffset.UtcNow.ToUnixTimeSeconds()+(i*10);
 
                     _qrStuffLogic.Create(new BarcodeScannerContracts.BindingModels.QrStuffBindingModel
                     {
@@ -177,41 +234,35 @@ namespace BarcodeScanner
                 PrinterSettings = new PrinterSettings
                 {
                     PrinterName = selectedPrinter
-                },
-                DefaultPageSettings = { Margins = new Margins(0, 0, 0, 0) }
+                }
             };
 
             int currentIndex = 0;
             bool isBarcodePage = true;
 
+            const int rightMargin = 20;
+
             printDocument.PrintPage += (s, ev) =>
             {
-                Rectangle printArea = ev.MarginBounds;
-                float width = (float)printArea.Width;
-                float height = (float)printArea.Height;
-
                 var imageToPrint = isBarcodePage ? barcodeImages[currentIndex] : qrImages[currentIndex];
 
-                using (Bitmap resizedImage = new Bitmap((int)width, (int)height))
+                float scaleX = (float)(ev.PageBounds.Width - rightMargin) / imageToPrint.Width;
+                float scaleY = (float)ev.PageBounds.Height / imageToPrint.Height;
+                float scale = Math.Min(scaleX, scaleY);
+
+                float scaledWidth = imageToPrint.Width * scale;
+                float scaledHeight = imageToPrint.Height * scale;
+
+                float offsetX = (ev.PageBounds.Width - scaledWidth - rightMargin) / 2;
+                float offsetY = (ev.PageBounds.Height - scaledHeight) / 2;
+
+                using (Graphics g = ev.Graphics)
                 {
-                    using (Graphics g = Graphics.FromImage(resizedImage))
-                    {
-                        g.Clear(Color.White);
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.Clear(Color.White);
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
-                        float scaleX = width / imageToPrint.Width;
-                        float scaleY = height / imageToPrint.Height;
-                        float scale = Math.Min(scaleX, scaleY);
-
-                        float scaledWidth = imageToPrint.Width * scale;
-                        float scaledHeight = imageToPrint.Height * scale;
-                        float offsetX =(width - scaledWidth) / 2;
-                        float offsetY =(height - scaledHeight) / 2;
-
-                        g.DrawImage(imageToPrint, offsetX, offsetY, scaledWidth, scaledHeight);
-                    }
-
-                    ev.Graphics.DrawImage(resizedImage, ev.MarginBounds.Left, ev.MarginBounds.Top);
+                    g.DrawImage(imageToPrint, offsetX, offsetY, scaledWidth, scaledHeight);
                 }
 
                 if (!isBarcodePage)

@@ -15,5 +15,6 @@ namespace BarcodeScannerContracts.StorageContracts
         List<QrStuffViewModel> GetFilteredAll(QrStuffSearchModel model);
         QrStuffViewModel? GetElement(QrStuffSearchModel model);
         QrStuffViewModel? Insert(QrStuffBindingModel model);
+        void DeleteAll();
     }
 }

@@ -15,5 +15,6 @@ namespace BarcodeScannerContracts.BusinessLogicContracts
         QrStuffViewModel? ReadElement(QrStuffSearchModel model);
         bool Create(QrStuffBindingModel model);
         bool ProcessBarcodeScan(long barcode);
+        void DeleteAll();
     }
 }
